@@ -128,6 +128,26 @@ class MainController {
       );
     }
   }
+  async removeGoida(msg) {
+    try {
+      const chatId = msg.chat.id;
+      const text = msg.text;
+
+      if (chatId !== +adminChatId) {
+        return bot.sendMessage(chatId, "Вы не являетесь администратором.");
+      }
+
+      if (!text) {
+        return bot.sendMessage(chatId, "Введите название файла");
+      }
+
+      const filePath = path.join(folder, text);
+      fs.unlinkSync(filePath);
+    } catch (error) {
+      console.error(error);
+      bot.sendMessage(chatId, "Произошла ошибка при обработке команды.");
+    }
+  }
 }
 
 export default new MainController();
