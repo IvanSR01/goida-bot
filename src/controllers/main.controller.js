@@ -128,6 +128,48 @@ class MainController {
       );
     }
   }
+
+	async sendSpecialGoida(msg) {
+		try {
+			const goidaData = [];
+	
+			const messageText = msg.text.trim();
+			const [fileName, chatId] = messageText.split(" ");
+	
+			if (!fileName || !chatId) {
+				return bot.sendMessage(msg.chat.id, "Неверный формат сообщения. Используйте: <имя_файла> <chat_id>");
+			}
+	
+			fs.readdirSync(folder).forEach((element) => {
+				goidaData.push(element);
+			});
+	
+			if (goidaData.length === 0) {
+				return bot.sendMessage(msg.chat.id, "Папка пустая.");
+			}
+	
+			const filePath = path.join(folder, fileName);
+			if (!fs.existsSync(filePath)) {
+				return bot.sendMessage(msg.chat.id, `Файл с именем "${fileName}" не найден.`);
+			}
+	
+			const fileExtension = path.extname(fileName).toLowerCase();
+			const imageExtensions = [".jpg", ".jpeg", ".png", ".gif"];
+	
+			if (imageExtensions.includes(fileExtension)) {
+				await bot.sendPhoto(chatId, filePath);
+			} else {
+				await bot.sendDocument(chatId, filePath);
+			}
+	
+			bot.sendMessage(msg.chat.id, `Файл "${fileName}" успешно отправлен в чат ${chatId}.`);
+		} catch (error) {
+			console.error(error);
+			bot.sendMessage(msg.chat.id, "Произошла ошибка при отправке файла.");
+		}
+	}
+	
+
   async removeGoida(msg) {
     try {
       const chatId = msg.chat.id;
